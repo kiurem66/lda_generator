@@ -58,8 +58,8 @@ SKILL_SCORE_LAYERS = {
 
 # Layer per le barre colorate delle abilità (Colore = attivo, B&N = disattivato)
 SKILL_COLOR_LAYERS = {
-    "agilita": {"color": None, "bn": None},
-    "armi_da_fuoco": {"color": None, "bn": None},
+    "agilita": {"color": "Colore Agilita", "bn": "B&N Agilita"},
+    "armi_da_fuoco": {"color": "Colore Armi da Fuoco", "bn": "B&N Armi da Fuoco"},
     "armi_da_mischia": {"color": "Colore Armi da Mischia", "bn": "B&N Armi da Mischia"},
     "manualita": {"color": "Colore Manualità", "bn": "B&N Manualità"},
     "rissa": {"color": "Colore Rissa", "bn": "B&N Rissa"},
@@ -67,14 +67,14 @@ SKILL_COLOR_LAYERS = {
     "accademiche": {"color": "Colore Accademiche", "bn": "B&N Accademiche"},
     "affinita_animale": {"color": "Colore Affinità Animale", "bn": "B&N Affinità Animale"},
     "empatia": {"color": "Colore Empatia", "bn": "B&N Empatia"},
-    "intimidire": {"color": "Colore Intimidire", "bn": None},
+    "intimidire": {"color": "Colore Intimidire", "bn": "B&N Intimidire"},
     "autocontrollo": {"color": "Colore Autocontrollo", "bn": "Bianco e nero Autocontrollo"},
     "espressione_artistica": {"color": "Colore Espressione Artistica", "bn": "B&N Espressione Artistica copy"},
     "sotterfugio": {"color": "Colore Sotterfugio", "bn": "B&N Sotterfugio"},
-    "intuito": {"color": None, "bn": None},
-    "investigare": {"color": None, "bn": None},
+    "intuito": {"color": "Colore Intuito", "bn": "B&N Intuito"},
+    "investigare": {"color": "Colore Investigare", "bn": "B&N Investigare"},
     "medicina": {"color": "Colore Medicina", "bn": "B&N Medicina"},
-    "occulto": {"color": None, "bn": None},
+    "occulto": {"color": "Colore Occulto", "bn": "B&N Occulto"},
     "tecnologia": {"color": "Colore Tecnologia", "bn": "B&N Tecnologia"},
 }
 
@@ -302,16 +302,16 @@ class CharacterSheetApp:
         self.points_frame = ttk.Frame(notebook, padding="10")
         
         ttk.Label(self.points_frame, text="Punti Sangue:", font=('Arial', 10, 'bold')).grid(row=0, column=0, sticky=tk.W, pady=5)
-        ttk.Spinbox(self.points_frame, from_=0, to=15, textvariable=self.character_data["punti_sangue"]).grid(row=0, column=1, sticky=tk.W, pady=2)
+        ttk.Spinbox(self.points_frame, from_=5, to=10, textvariable=self.character_data["punti_sangue"]).grid(row=0, column=1, sticky=tk.W, pady=2)
         
         ttk.Label(self.points_frame, text="Volontà:", font=('Arial', 10, 'bold')).grid(row=1, column=0, sticky=tk.W, pady=5)
-        ttk.Spinbox(self.points_frame, from_=0, to=10, textvariable=self.character_data["volonta"]).grid(row=1, column=1, sticky=tk.W, pady=2)
+        ttk.Spinbox(self.points_frame, from_=1, to=5, textvariable=self.character_data["volonta"]).grid(row=1, column=1, sticky=tk.W, pady=2)
         
         ttk.Label(self.points_frame, text="Umanità/Sentiero:", font=('Arial', 10, 'bold')).grid(row=2, column=0, sticky=tk.W, pady=5)
-        ttk.Spinbox(self.points_frame, from_=0, to=10, textvariable=self.character_data["umanita"]).grid(row=2, column=1, sticky=tk.W, pady=2)
+        ttk.Spinbox(self.points_frame, from_=2, to=10, textvariable=self.character_data["umanita"]).grid(row=2, column=1, sticky=tk.W, pady=2)
         
         ttk.Label(self.points_frame, text="Salute:", font=('Arial', 10, 'bold')).grid(row=3, column=0, sticky=tk.W, pady=5)
-        ttk.Spinbox(self.points_frame, from_=0, to=7, textvariable=self.character_data["salute"]).grid(row=3, column=1, sticky=tk.W, pady=2)
+        ttk.Spinbox(self.points_frame, from_=5, to=8, textvariable=self.character_data["salute"]).grid(row=3, column=1, sticky=tk.W, pady=2)
         
         ttk.Label(self.points_frame, text="Inserisci il numero di cerchi/caselle piene", 
                   font=('Arial', 8, 'italic')).grid(row=4, column=0, columnspan=2, sticky=tk.W, pady=5)
@@ -322,11 +322,11 @@ class CharacterSheetApp:
         
         ttk.Label(self.discipline_bg_frame, text="Discipline (es: Auspex 1, Demenza 2):", 
                   font=('Arial', 10, 'bold')).grid(row=0, column=0, sticky=tk.W, pady=5)
-        ttk.Entry(self.discipline_bg_frame, textvariable=self.character_data["discipline"]).grid(row=0, column=1, sticky=tk.EW, pady=2)
+        ttk.Entry(self.discipline_bg_frame, textvariable=self.character_data["discipline"]).grid(row=0, column=1, sticky=tk.NSEW, pady=2)
         
         ttk.Label(self.discipline_bg_frame, text="Background (es: Generazione 13, Risorse 2):", 
                   font=('Arial', 10, 'bold')).grid(row=1, column=0, sticky=tk.W, pady=5)
-        ttk.Entry(self.discipline_bg_frame, textvariable=self.character_data["background"]).grid(row=1, column=1, sticky=tk.EW, pady=2)
+        ttk.Entry(self.discipline_bg_frame, textvariable=self.character_data["background"]).grid(row=1, column=1, sticky=tk.NSEW, pady=2)
         
         self.discipline_bg_frame.columnconfigure(1, weight=1)
     
@@ -499,8 +499,8 @@ class CharacterSheetApp:
             "Punteggio Tecnologia": {"name": "Walshes-Regular", "size": 56, "bold": False},
             
             # Discipline e Background (Walshes-Regular, dimensioni specifiche)
-            "Auspex Demenza Oscurazione": {"name": "Walshes-Regular", "size": 83, "bold": False},
-            "Generazione Risorse Alleati Infl": {"name": "Walshes-Regular", "size": 64, "bold": False},
+            "discipline_text": {"name": "Walshes-Regular", "size": 83, "bold": False},
+            "bg_text": {"name": "Walshes-Regular", "size": 64, "bold": False},
             
             # Layer con VeteranTypewriter
             "Mr. Prova": {"name": "VeteranTypewriter", "size": 89, "bold": False},
@@ -560,13 +560,34 @@ class CharacterSheetApp:
             )
             
             try:
-                # Disegna il testo con lo stesso contenuto del layer nascosto
-                draw.text((x, y), text, font=font, fill="black", anchor="mm")
+                # Gestione testo multilinea
+                if "\n" in text:
+                    lines = text.split("\n")
+                    ascent, descent = font.getmetrics()
+                    line_height = ascent + descent
+                    total_height = len(lines) * line_height
+                    
+                    start_y = y - total_height // 2 + ascent
+                    
+                    for line in lines:
+                        if line.strip():  # Salta righe vuote
+                            width = font.getlength(line)
+                            draw.text((x - width // 2, start_y), line, font=font, fill="black")
+                            start_y += line_height
+                else:
+                    # Disegna il testo con lo stesso contenuto del layer nascosto
+                    draw.text((x, y), text, font=font, fill="black", anchor="mm")
             except Exception as e:
                 # Se c'è un errore, usa il font di default
                 print(f"Errore nel disegnare '{text}' con {font_config_entry}: {e}. Tentativo con font di default...")
                 default_font = ImageFont.load_default()
-                draw.text((x, y), text, font=default_font, fill="black", anchor="mm")
+                if "\n" in text:
+                    lines = text.split("\n")
+                    for i, line in enumerate(lines):
+                        if line.strip():
+                            draw.text((x, y + i * 15), line, font=default_font, fill="black")
+                else:
+                    draw.text((x, y), text, font=default_font, fill="black", anchor="mm")
     
     def modify_psd_layers(self, psd):
         """Modifica i layer del PSD in base ai dati del personaggio"""
@@ -666,12 +687,15 @@ class CharacterSheetApp:
         sociali = self.character_data["sociali"].get()
         mentali = self.character_data["mentali"].get()
         
-        if "Punteggio Fisici" in layer_map:
-            layer_map["Punteggio Fisici"].visible = fisici > 0
-        if "Punteggio Sociali" in layer_map:
-            layer_map["Punteggio Sociali"].visible = sociali > 0
-        if "Punteggio Mentali" in layer_map:
-            layer_map["Punteggio Mentali"].visible = mentali > 0
+
+        for i in range(2, fisici):
+            layer_map[f"fis{i}"].visible = True
+
+        for i in range(2, sociali):
+            layer_map[f"soc{i}"].visible = True
+
+        for i in range(2, mentali):
+            layer_map[f"men{i}"].visible = True
     
     def update_blood_will_humanity_layers(self, layer_map):
         """Aggiorna i cerchi di Punti Sangue, Volontà, Umanità"""
@@ -680,57 +704,88 @@ class CharacterSheetApp:
         volonta = self.character_data["volonta"].get()
         umanita = self.character_data["umanita"].get()
         
-        if "Punteggio Punti Sangue" in layer_map:
-            layer_map["Punteggio Punti Sangue"].visible = punti_sangue > 0
+
+
+        for i in range(6, punti_sangue):
+            layer_map[f"B&N Punti Sangue {i}"].visible = False
         
-        if "Punteggio Volontà" in layer_map:
-            layer_map["Punteggio Volontà"].visible = volonta > 0
-        if "B&N Punteggio Volontà" in layer_map:
-            layer_map["B&N Punteggio Volontà"].visible = volonta == 0
-        
-        if "Punteggio Umanità/Sentiero" in layer_map:
-            layer_map["Punteggio Umanità/Sentiero"].visible = umanita > 0
-        if "B&N Punteggio Umanità/Sentiero" in layer_map:
-            layer_map["B&N Punteggio Umanità/Sentiero"].visible = umanita == 0
+
+        for i in range(2, volonta):
+            layer_map[f"B&N Punti Volontà {i}"].visible = False
+    
+
+        for i in range(3, volonta):
+            layer_map[f"B&N Punti Umanità {i}"].visible = False
+
     
     def update_health_boxes(self, layer_map):
         """Aggiorna le caselle di Salute"""
         
         salute = self.character_data["salute"].get()
         
-        for i, box_name in enumerate(HEALTH_BOX_LAYERS["active"]):
-            if box_name in layer_map:
-                layer_map[box_name].visible = i < salute
-        
-        for i, box_name in enumerate(HEALTH_BOX_LAYERS["inactive"]):
-            if box_name in layer_map:
-                layer_map[box_name].visible = (salute + i) < 7
+        for i in range(5, salute):
+            layer_map[f"PV{i}"].visible = True
     
     def update_discipline_bg_layers(self, layer_map):
-        """Aggiorna i layer di Discipline e Background (nascondendoli e salvando le info per il disegno)."""
+        """Aggiorna i layer di Discipline e Background.
         
-        discipline = self.character_data["discipline"].get() or ""
-        background = self.character_data["background"].get() or ""
+        I valori inseriti dall'utente sono separati da virgole.
+        Esempio:
+            Auspex 1, Demenza 2, Dominazione 3
         
-        if "Auspex Demenza Oscurazione" in layer_map:
-            layer = layer_map["Auspex Demenza Oscurazione"]
-            if hasattr(layer, 'kind') and layer.kind == 'type':
-                if hasattr(layer, 'bbox'):
-                    self.text_layers_info["Auspex Demenza Oscurazione"] = {
-                        "bbox": layer.bbox,
-                        "text": discipline
-                    }
-                layer.visible = False
-        
-        if "Generazione Risorse Alleati Infl" in layer_map:
-            layer = layer_map["Generazione Risorse Alleati Infl"]
-            if hasattr(layer, 'kind') and layer.kind == 'type':
-                if hasattr(layer, 'bbox'):
-                    self.text_layers_info["Generazione Risorse Alleati Infl"] = {
-                        "bbox": layer.bbox,
-                        "text": background
-                    }
-                layer.visible = False
+        Nel PNG verranno visualizzati su righe separate.
+        """
+
+        # Recupera i valori inseriti
+        discipline_raw = self.character_data["discipline"].get() or ""
+        background_raw = self.character_data["background"].get() or ""
+
+        # Divide per virgola, rimuove gli spazi inutili
+        # e ignora eventuali elementi vuoti
+        discipline = [
+            item.strip()
+            for item in discipline_raw.split(",")
+            if item.strip()
+        ]
+
+        background = [
+            item.strip()
+            for item in background_raw.split(",")
+            if item.strip()
+        ]
+
+        # Trasforma le liste in testo multilinea
+        discipline_text = "\n".join(discipline)
+        background_text = "\n".join(background)
+
+        # -------------------------
+        # DISCIPLINE
+        # -------------------------
+        if "discipline_text" in layer_map:
+            layer = layer_map["discipline_text"]
+            
+            if hasattr(layer, "bbox"):
+                self.text_layers_info["discipline_text"] = {
+                    "bbox": layer.bbox,
+                    "text": discipline_text
+                }
+            # Nasconde il layer originale del PSD (indipendentemente dal tipo)
+            layer.visible = False
+
+        # -------------------------
+        # BACKGROUND
+        # -------------------------
+        if "bg_text" in layer_map:
+            layer = layer_map["bg_text"]
+            
+            if hasattr(layer, "bbox"):
+                self.text_layers_info["bg_text"] = {
+                    "bbox": layer.bbox,
+                    "text": background_text
+                }
+            # Nasconde il layer originale del PSD (indipendentemente dal tipo)
+            layer.visible = False
+
 
 
 if __name__ == "__main__":
