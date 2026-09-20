@@ -204,10 +204,10 @@ class CharacterSheetApp:
         ttk.Entry(self.general_frame, textvariable=self.character_data["generazione"]).grid(row=3, column=1, sticky=tk.EW, pady=2)
         
         ttk.Label(self.general_frame, text="Pregi:").grid(row=4, column=0, sticky=tk.W, pady=2)
-        ttk.Entry(self.general_frame, textvariable=self.character_data["pregi"]).grid(row=4, column=1, sticky=tk.NW, pady=2)
+        ttk.Entry(self.general_frame, textvariable=self.character_data["pregi"]).grid(row=4, column=1, sticky=tk.EW, pady=2)
         
         ttk.Label(self.general_frame, text="Difetti:").grid(row=5, column=0, sticky=tk.W, pady=2)
-        ttk.Entry(self.general_frame, textvariable=self.character_data["difetti"]).grid(row=5, column=1, sticky=tk.NW, pady=2)
+        ttk.Entry(self.general_frame, textvariable=self.character_data["difetti"]).grid(row=5, column=1, sticky=tk.EW, pady=2)
         
         self.general_frame.columnconfigure(1, weight=1)
     
@@ -327,11 +327,11 @@ class CharacterSheetApp:
         
         ttk.Label(self.discipline_bg_frame, text="Discipline (es: Auspex 1, Demenza 2):", 
                   font=('Arial', 10, 'bold')).grid(row=0, column=0, sticky=tk.W, pady=5)
-        ttk.Entry(self.discipline_bg_frame, textvariable=self.character_data["discipline"]).grid(row=0, column=1, sticky=tk.NW, pady=2)
+        ttk.Entry(self.discipline_bg_frame, textvariable=self.character_data["discipline"]).grid(row=0, column=1, sticky=tk.EW, pady=2)
         
         ttk.Label(self.discipline_bg_frame, text="Background (es: Generazione 13, Risorse 2):", 
                   font=('Arial', 10, 'bold')).grid(row=1, column=0, sticky=tk.W, pady=5)
-        ttk.Entry(self.discipline_bg_frame, textvariable=self.character_data["background"]).grid(row=1, column=1, sticky=tk.NW, pady=2)
+        ttk.Entry(self.discipline_bg_frame, textvariable=self.character_data["background"]).grid(row=1, column=1, sticky=tk.EW, pady=2)
         
         self.discipline_bg_frame.columnconfigure(1, weight=1)
     
