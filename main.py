@@ -535,6 +535,78 @@ class CharacterSheetApp:
         finally:
             self.hide_loading_screen()
     
+    def load_font(self, font_name, size, bold=False):
+        """Carica un font dalla cartella locale 'fonts/' o dal sistema"""
+        font_dir = os.path.join(os.path.dirname(__file__), "fonts")
+        font_path = None
+        
+        font_files = {
+            "Walshes-Regular": "walshes.otf",
+            "VeteranTypewriter": "veteran typewriter.ttf",
+        }
+        
+        if font_name in font_files:
+            font_path = os.path.join(font_dir, font_files[font_name])
+        
+        if font_path and os.path.exists(font_path):
+            try:
+                return ImageFont.truetype(font_path, size)
+            except Exception as e:
+                print(f"Errore nel caricare {font_path}: {e}")
+        
+        try:
+            return ImageFont.truetype(font_name, size)
+        except:
+            pass
+        
+        return ImageFont.load_default()
+    
+    def find_optimal_font_size(self, text, bbox, base_size, font_name):
+        """Trova la dimensione del font ottimale per far entrare il testo nella bbox.
+        
+        Args:
+            text: Il testo da disegnare
+            bbox: Tupla (x1, y1, x2, y2) del rettangolo di delimitazione
+            base_size: Dimensione base del font
+            font_name: Nome del font da utilizzare
+            
+        Returns:
+            Dimensione del font ottimale (intero)
+        """
+        bbox_width = bbox[2] - bbox[0]
+        bbox_height = bbox[3] - bbox[1]
+        
+        if not text or not text.strip():
+            return base_size
+        
+        # Prova dimensioni decrescenti
+        for size in range(base_size, 8, -2):
+            try:
+                font = self.load_font(font_name, size)
+                lines = text.split("\n")
+                
+                # Calcola larghezza massima tra le righe
+                max_line_width = 0
+                for line in lines:
+                    if line.strip():
+                        line_width = font.getlength(line)
+                        if line_width > max_line_width:
+                            max_line_width = line_width
+                
+                # Calcola altezza totale (stesso fattore di draw_text_on_image)
+                ascent, descent = font.getmetrics()
+                line_height = (ascent + descent) * 0.75
+                total_height = len(lines) * line_height
+                
+                # Usa il 95% della bbox per avere un po' di margine
+                if max_line_width <= bbox_width * 0.95 and total_height <= bbox_height * 0.95:
+                    return size
+                    
+            except Exception:
+                continue
+        
+        return 8  # Dimensione minima
+    
     def draw_text_on_image(self, image):
         """Disegna il testo sull'immagine usando PIL e i font del template PSD (Walshes-Regular, VeteranTypewriter)."""
         draw = ImageDraw.Draw(image)
@@ -589,36 +661,6 @@ class CharacterSheetApp:
             "13": {"name": "VeteranTypewriter", "size": 77, "bold": False},
         }
         
-        # Funzione per caricare un font dalla cartella locale 'fonts/' o dal sistema
-        def load_font(font_name, size, bold=False):
-            font_dir = os.path.join(os.path.dirname(__file__), "fonts")
-            font_path = None
-            
-            # Mappa dei font personalizzati ai file nella cartella fonts/
-            font_files = {
-                "Walshes-Regular": "walshes.otf",
-                "VeteranTypewriter": "veteran typewriter.ttf",
-            }
-            
-            if font_name in font_files:
-                font_path = os.path.join(font_dir, font_files[font_name])
-            
-            # Prova a caricare il font locale
-            if font_path and os.path.exists(font_path):
-                try:
-                    return ImageFont.truetype(font_path, size)
-                except Exception as e:
-                    print(f"Errore nel caricare {font_path}: {e}")
-            
-            # Fallback: prova a caricare il font dal sistema
-            try:
-                return ImageFont.truetype(font_name, size)
-            except:
-                pass
-            
-            # Fallback finale: font di default
-            return ImageFont.load_default()
-        
         # Disegna tutti i testi salvati nelle loro posizioni originali
         for layer_name, info in self.text_layers_info.items():
             bbox = info["bbox"]
@@ -633,9 +675,18 @@ class CharacterSheetApp:
             
             # Ottieni la configurazione del font per questo layer
             font_config_entry = font_config.get(layer_name, {"name": "Walshes-Regular", "size": 56, "bold": False})
-            font = load_font(
-                font_config_entry["name"],
+            
+            # Calcola la dimensione ottimale del font in base al testo e allo spazio disponibile
+            optimal_size = self.find_optimal_font_size(
+                text,
+                bbox,
                 font_config_entry["size"],
+                font_config_entry["name"]
+            )
+            
+            font = self.load_font(
+                font_config_entry["name"],
+                optimal_size,
                 font_config_entry["bold"]
             )
             
@@ -645,9 +696,9 @@ class CharacterSheetApp:
                     lines = text.split("\n")
                     ascent, descent = font.getmetrics()
                     line_height = (ascent + descent) * 0.75  # Riduce lo spazio tra le righe
-                    total_height = len(lines) * line_height
                     
-                    start_y = y - total_height // 2 + ascent
+                    # Allinea in alto con piccolo margine
+                    start_y = bbox[1] + 5
                     
                     for line in lines:
                         if line.strip():  # Salta righe vuote
