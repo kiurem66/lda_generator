@@ -148,6 +148,9 @@ class CharacterSheetApp:
         # Percorso del file PSD
         self.psd_path = os.path.join(os.path.dirname(__file__), "Scheda Lanterna d'Avorio.psd")
         
+        # Finestra di caricamento
+        self.loading_window = None
+        
         if not os.path.exists(self.psd_path):
             messagebox.showerror("Errore", f"File PSD non trovato: {self.psd_path}")
             self.root.destroy()
@@ -166,6 +169,7 @@ class CharacterSheetApp:
         self.create_attributes_tab(notebook)
         self.create_skills_tab(notebook)
         self.create_points_tab(notebook)
+
         self.create_discipline_bg_tab(notebook)
         
         notebook.add(self.general_frame, text="Dati Generali")
@@ -180,6 +184,7 @@ class CharacterSheetApp:
         ttk.Button(button_frame, text="Salva in JSON", command=self.save_to_json).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="Carica da JSON", command=self.load_from_json).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="Genera PNG", command=self.generate_png).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="Genera PSD", command=self.generate_psd).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="Esci", command=self.root.quit).pack(side=tk.RIGHT, padx=5)
     
     def create_general_tab(self, notebook):
@@ -330,6 +335,42 @@ class CharacterSheetApp:
         
         self.discipline_bg_frame.columnconfigure(1, weight=1)
     
+    def show_loading_screen(self, title="Operazione in corso"):
+        """Mostra una schermata di caricamento modale"""
+        self.loading_window = tk.Toplevel(self.root)
+        self.loading_window.title(title)
+        self.loading_window.geometry("300x100")
+        self.loading_window.resizable(False, False)
+        
+        # Centra la finestra
+        self.loading_window.eval('tk::PlaceWindow . center')
+        
+        # Rendi modale
+        self.loading_window.grab_set()
+        self.loading_window.transient(self.root)
+        
+        # Contenuto
+        main_frame = ttk.Frame(self.loading_window, padding="20")
+        main_frame.pack(fill=tk.BOTH, expand=True)
+        
+        ttk.Label(main_frame, text="Elaborazione in corso...", font=('Arial', 10)).pack(pady=5)
+        self.progress_bar = ttk.Progressbar(main_frame, mode='indeterminate')
+        self.progress_bar.pack(pady=5)
+        self.progress_bar.start(10)
+        
+        # Impedisci la chiusura manuale
+        self.loading_window.protocol("WM_DELETE_WINDOW", lambda: None)
+        
+        # Forza l'aggiornamento della finestra
+        self.root.update_idletasks()
+    
+    def hide_loading_screen(self):
+        """Nasconde la schermata di caricamento"""
+        if hasattr(self, 'loading_window') and self.loading_window:
+            self.loading_window.grab_release()
+            self.loading_window.destroy()
+            self.loading_window = None
+    
     def save_to_json(self):
         """Salva i dati del personaggio in un file JSON"""
         data = {
@@ -426,6 +467,9 @@ class CharacterSheetApp:
     def generate_png(self):
         """Genera il file PNG dalla scheda compilata"""
         try:
+            self.show_loading_screen("Generazione PNG")
+            self.root.update()
+            
             with tempfile.NamedTemporaryFile(suffix='.psd', delete=False) as temp_psd:
                 temp_psd_path = temp_psd.name
             
@@ -454,6 +498,42 @@ class CharacterSheetApp:
             messagebox.showerror("Errore", f"Errore nella generazione: {str(e)}")
             import traceback
             traceback.print_exc()
+        finally:
+            self.hide_loading_screen()
+    
+    def generate_psd(self):
+        """Genera il file PSD dalla scheda compilata"""
+        try:
+            self.show_loading_screen("Generazione PSD")
+            self.root.update()
+            
+            with tempfile.NamedTemporaryFile(suffix='.psd', delete=False) as temp_psd:
+                temp_psd_path = temp_psd.name
+            
+            shutil.copy2(self.psd_path, temp_psd_path)
+            
+            psd = PSDImage.open(temp_psd_path)
+            
+            self.modify_psd_layers(psd)
+            
+            output_path = filedialog.asksaveasfilename(
+                defaultextension=".psd",
+                filetypes=[("PSD files", "*.psd"), ("All files", "*.*")],
+                title="Salva file PSD"
+            )
+            
+            if output_path:
+                psd.save(output_path)
+                messagebox.showinfo("Successo", f"Scheda PSD generata e salvata in {output_path}")
+            
+            os.unlink(temp_psd_path)
+            
+        except Exception as e:
+            messagebox.showerror("Errore", f"Errore nella generazione PSD: {str(e)}")
+            import traceback
+            traceback.print_exc()
+        finally:
+            self.hide_loading_screen()
     
     def draw_text_on_image(self, image):
         """Disegna il testo sull'immagine usando PIL e i font del template PSD (Walshes-Regular, VeteranTypewriter)."""
@@ -688,13 +768,13 @@ class CharacterSheetApp:
         mentali = self.character_data["mentali"].get()
         
 
-        for i in range(2, fisici):
+        for i in range(2, fisici+1):
             layer_map[f"fis{i}"].visible = True
 
-        for i in range(2, sociali):
+        for i in range(2, sociali+1):
             layer_map[f"soc{i}"].visible = True
 
-        for i in range(2, mentali):
+        for i in range(2, mentali+1):
             layer_map[f"men{i}"].visible = True
     
     def update_blood_will_humanity_layers(self, layer_map):
@@ -706,15 +786,15 @@ class CharacterSheetApp:
         
 
 
-        for i in range(6, punti_sangue):
+        for i in range(6, punti_sangue+1):
             layer_map[f"B&N Punti Sangue {i}"].visible = False
         
 
-        for i in range(2, volonta):
+        for i in range(2, volonta+1):
             layer_map[f"B&N Punti Volontà {i}"].visible = False
     
 
-        for i in range(3, volonta):
+        for i in range(3, umanita+1):
             layer_map[f"B&N Punti Umanità {i}"].visible = False
 
     
@@ -723,7 +803,7 @@ class CharacterSheetApp:
         
         salute = self.character_data["salute"].get()
         
-        for i in range(5, salute):
+        for i in range(6, salute+1):
             layer_map[f"PV{i}"].visible = True
     
     def update_discipline_bg_layers(self, layer_map):
