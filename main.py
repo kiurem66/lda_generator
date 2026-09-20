@@ -644,7 +644,7 @@ class CharacterSheetApp:
                 if "\n" in text:
                     lines = text.split("\n")
                     ascent, descent = font.getmetrics()
-                    line_height = ascent + descent
+                    line_height = (ascent + descent) * 0.75  # Riduce lo spazio tra le righe
                     total_height = len(lines) * line_height
                     
                     start_y = y - total_height // 2 + ascent
@@ -654,6 +654,9 @@ class CharacterSheetApp:
                             width = font.getlength(line)
                             draw.text((x - width // 2, start_y), line, font=font, fill="black")
                             start_y += line_height
+                        else:
+                            # Per righe vuote, aggiungi solo metà dell'altezza per ridurre lo spazio
+                            start_y += line_height * 0.5
                 else:
                     # Disegna il testo con lo stesso contenuto del layer nascosto
                     draw.text((x, y), text, font=font, fill="black", anchor="mm")
@@ -725,7 +728,7 @@ class CharacterSheetApp:
             all_lines.append("")  # Aggiungi una riga vuota tra pregi e difetti
         all_lines.extend(difetti_lines)
         
-        combined_text = "\r".join(all_lines)
+        combined_text = "\n".join(all_lines)
         
         if "Pregi e Difetti" in layer_map:
             layer = layer_map["Pregi e Difetti"]
