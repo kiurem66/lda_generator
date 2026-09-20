@@ -204,10 +204,10 @@ class CharacterSheetApp:
         ttk.Entry(self.general_frame, textvariable=self.character_data["generazione"]).grid(row=3, column=1, sticky=tk.EW, pady=2)
         
         ttk.Label(self.general_frame, text="Pregi:").grid(row=4, column=0, sticky=tk.W, pady=2)
-        ttk.Entry(self.general_frame, textvariable=self.character_data["pregi"]).grid(row=4, column=1, sticky=tk.EW, pady=2)
+        ttk.Entry(self.general_frame, textvariable=self.character_data["pregi"]).grid(row=4, column=1, sticky=tk.NW, pady=2)
         
         ttk.Label(self.general_frame, text="Difetti:").grid(row=5, column=0, sticky=tk.W, pady=2)
-        ttk.Entry(self.general_frame, textvariable=self.character_data["difetti"]).grid(row=5, column=1, sticky=tk.EW, pady=2)
+        ttk.Entry(self.general_frame, textvariable=self.character_data["difetti"]).grid(row=5, column=1, sticky=tk.NW, pady=2)
         
         self.general_frame.columnconfigure(1, weight=1)
     
@@ -327,11 +327,11 @@ class CharacterSheetApp:
         
         ttk.Label(self.discipline_bg_frame, text="Discipline (es: Auspex 1, Demenza 2):", 
                   font=('Arial', 10, 'bold')).grid(row=0, column=0, sticky=tk.W, pady=5)
-        ttk.Entry(self.discipline_bg_frame, textvariable=self.character_data["discipline"]).grid(row=0, column=1, sticky=tk.NSEW, pady=2)
+        ttk.Entry(self.discipline_bg_frame, textvariable=self.character_data["discipline"]).grid(row=0, column=1, sticky=tk.NW, pady=2)
         
         ttk.Label(self.discipline_bg_frame, text="Background (es: Generazione 13, Risorse 2):", 
                   font=('Arial', 10, 'bold')).grid(row=1, column=0, sticky=tk.W, pady=5)
-        ttk.Entry(self.discipline_bg_frame, textvariable=self.character_data["background"]).grid(row=1, column=1, sticky=tk.NSEW, pady=2)
+        ttk.Entry(self.discipline_bg_frame, textvariable=self.character_data["background"]).grid(row=1, column=1, sticky=tk.NW, pady=2)
         
         self.discipline_bg_frame.columnconfigure(1, weight=1)
     
@@ -343,7 +343,7 @@ class CharacterSheetApp:
         self.loading_window.resizable(False, False)
         
         # Centra la finestra
-        self.loading_window.eval('tk::PlaceWindow . center')
+        self.loading_window.tk.call('tk::PlaceWindow', self.loading_window, 'center')
         
         # Rendi modale
         self.loading_window.grab_set()
@@ -714,7 +714,19 @@ class CharacterSheetApp:
         
         pregi = self.character_data["pregi"].get() or ""
         difetti = self.character_data["difetti"].get() or ""
-        combined_text = f"{pregi}\r{difetti}"
+        
+        # Separa pregi e difetti in linee se contengono virgole
+        pregi_lines = [p.strip() for p in pregi.split(",") if p.strip()]
+        difetti_lines = [d.strip() for d in difetti.split(",") if d.strip()]
+        
+        # Combina tutto in un testo multilinea con separazione tra pregi e difetti
+        all_lines = pregi_lines
+        if pregi_lines and difetti_lines:
+            all_lines.append("")  # Aggiungi una riga vuota tra pregi e difetti
+        all_lines.extend(difetti_lines)
+        
+        combined_text = "\r".join(all_lines)
+        
         if "Pregi e Difetti" in layer_map:
             layer = layer_map["Pregi e Difetti"]
             if hasattr(layer, 'kind') and layer.kind == 'type':
